@@ -10,90 +10,123 @@
     <script defer src="face-api.min.js"></script>
     <script defer src="webgazer.js"></script>
 </head>
-<body>
-    <div class="video-monitor-system" id="videoMonitor" style="display: none;">
-        <div class="video-box" id="gazeMonitor">
-            <div class="label">WebGazer - Трекинг</div>
-            <div id="gazeValues" class="values"></div>
-            <div id="webgazerVideoParent"></div>
-        </div>
-        <div class="video-box" id="faceMonitor">
-            <div class="label">Face API - Мимика</div>
-            <div id="faceValues" class="values"></div>
-            <div id="faceVideoContainer"></div>
-        </div>
-    </div>
-
-    <div class="calibration-overlay" id="calibrationOverlay">
-        <div class="calibration-modal">
-            <h2>Настройка системы</h2>
-            <p>Нажмите "Начать" и следуйте инструкциям: кликайте на красные точки (по 5 раз на каждую).</p>
-            <button onclick="startCalibration()" class="calibration-btn" id="startBtn">Начать калибровку</button>
-            <div id="calibrationStatus" class="calibration-status"></div>
-        </div>
-    </div>
-
-    <div class="game-container" id="gameContainer" style="display: none;">
-        <h1>Мемо: Найди пару</h1>
-
-        <div class="stats">
-            <div>Попытки: <span id="attempts">0</span></div>
-            <div>Пары: <span id="pairsFound">0</span> / <span id="totalPairs">12</span></div>
-        </div>
-
-        <div class="board" id="board"></div>
-
-        <div id="result-modal" class="modal">
-            <div class="modal-content">
-                <h2>Результаты игры</h2>
-
-                <h2>Вы прошли игру за <span id="gameTimeValue"></span></h2>
-                <div id="heatmap-result-container"></div>
-
-                <!-- Статистика карт -->
-                <div id="difficultyStatsBlock" class="difficulty-stats-block">
-                    <strong>Сложность карт:</strong><br><br>
-                    <div class="difficulty-cards-container">
-                        <div class="difficulty-card">
-                            <div class="difficulty-card-title">Самая сложная</div>
-                            <div id="hardestCardImage" class="card-image-container hard-card-border"></div>
-                            <div id="hardestCardId" class="card-id">Карта ?</div>
-                            <div id="hardestCardAttempts" class="card-attempts">0 попыток</div>
-                        </div>
-                        <div class="difficulty-card">
-                            <div class="difficulty-card-title">Самая простая</div>
-                            <div id="easiestCardImage" class="card-image-container easy-card-border"></div>
-                            <div id="easiestCardId" class="card-id">Карта ?</div>
-                            <div id="easiestCardAttempts" class="card-attempts">0 попыток</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- эмоции -->
-                <div id="emotionStatsBlock" class="emotion-stats-block">
-                    <strong>😊 Эмоции за игру:</strong><br>
-                    <div class="emotion-badges">
-                        <span class="emotion-badge">😊 Счастливый <span id="happyCount">0</span></span>
-                        <span class="emotion-badge">😢 Грустный <span id="sadCount">0</span></span>
-                        <span class="emotion-badge">😠 Злой <span id="angryCount">0</span></span>
-                        <span class="emotion-badge">😲 Удивленный <span id="surprisedCount">0</span></span>
-                        <span class="emotion-badge">😨 Испуганный <span id="fearfulCount">0</span></span>
-                        <span class="emotion-badge">🤢 Отвращенный <span id="disgustedCount">0</span></span>
-                        <span class="emotion-badge">😐 Нейтральный <span id="neutralCount">0</span></span>
-                    </div>
-                </div>
-
-                <div class="modal-buttons">
-                    <button onclick="closeModal()">Закрыть и начать заново</button>
-                    <button onclick="downloadHeatmap()">Сохранить</button>
+    <body>
+        <div class="registration">
+            <div class="modal-content" style="max-width: 400px;">
+                <h2>Регистрация</h2>
+                <p>Введите ваш ID из списка учащихся</p>
+                <input type="number" id="userID" placeholder="Ваш ID"
+                       style="width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
+                <div>
+                    <button onclick="showRules()" class="button" >Прочитать правила</button>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div id="gazeIndicator"></div>
-    <script src="game_script.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/heatmap.js/2.0.2/heatmap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-</body>
+        <div class="rules-overlay" id="rulesOverlay" style="display: none; ">
+            <div class="modal-content" style="max-height: 80vh; overflow-y: auto;">
+                <h1>Правила игы</h1>
+
+                <h2>Этап 1: Калибровка </h2>
+                <p>Перед вами на экране высветится <b>9</b> красных точек на каждую из них надо нажать <b>5 раз</b></p>
+                <p>После нажатия на точки, нужно посмотреть на центр экрана <b>2 секунды</b></p>
+
+                <h2>Этап 2: Игра </h2>
+                <p>Перед вами будет <b>24 карты</b> это <b>12 пар</b></p>
+                <p>Ваша цель - найти пары одинаковых карт</p>
+                <p>За один ход вы можете открыть две карты</p>
+                <p>Если они <b>совпали</b>, то они остаются открытыми и выходят из игры</p>
+                <p>Если <b>не совпали</b>, то они переворачиваются обратно и остаются в игре</p>
+
+                <h2>Этап 3: Результаты </h2>
+                <p>После прохождения игры Вам покажут ваши результаты игры:</p>
+                <p>-Тепловая карта вашего взгляда</p>
+                <p>-Самая сложная и простая карты</p>
+                <p>-Эмоции, которые вы испытвали</p>
+
+                <p>Согласны проходить игру?</p>
+                <div>
+                    <button onclick="startCalibration()">Да</button>
+                    <button onclick="closeModal()">Нет</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="video-monitor-system" id="videoMonitor" style="display: none;">
+            <div class="video-box" id="gazeMonitor">
+                <div class="label">WebGazer - Трекинг</div>
+                <div id="gazeValues" class="values"></div>
+                <div id="webgazerVideoParent"></div>
+            </div>
+            <div class="video-box" id="faceMonitor">
+                <div class="label">Face API - Мимика</div>
+                <div id="faceValues" class="values"></div>
+                <div id="faceVideoContainer"></div>
+            </div>
+        </div>
+
+        <div class="game-container" id="gameContainer" style="display: none;">
+            <h1>Мемо: Найди пару</h1>
+
+            <div class="stats">
+                <div>Попытки: <span id="attempts">0</span></div>
+                <div>Пары: <span id="pairsFound">0</span> / <span id="totalPairs">12</span></div>
+            </div>
+
+            <div class="board" id="board"></div>
+
+            <div id="result-modal" class="modal">
+                <div class="modal-content">
+                    <h2>Результаты игры</h2>
+
+                    <h2>Вы прошли игру за <span id="gameTimeValue"></span></h2>
+                    <div id="heatmap-result-container"></div>
+
+                    <!-- Статистика карт -->
+                    <div id="difficultyStatsBlock" class="difficulty-stats-block">
+                        <strong>Сложность карт:</strong><br><br>
+                        <div class="difficulty-cards-container">
+                            <div class="difficulty-card">
+                                <div class="difficulty-card-title">Самая сложная</div>
+                                <div id="hardestCardImage" class="card-image-container hard-card-border"></div>
+                                <div id="hardestCardId" class="card-id">Карта ?</div>
+                                <div id="hardestCardAttempts" class="card-attempts">0 попыток</div>
+                            </div>
+                            <div class="difficulty-card">
+                                <div class="difficulty-card-title">Самая простая</div>
+                                <div id="easiestCardImage" class="card-image-container easy-card-border"></div>
+                                <div id="easiestCardId" class="card-id">Карта ?</div>
+                                <div id="easiestCardAttempts" class="card-attempts">0 попыток</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- эмоции -->
+                    <div id="emotionStatsBlock" class="emotion-stats-block">
+                        <strong>😊 Эмоции за игру:</strong><br>
+                        <div class="emotion-badges">
+                            <span class="emotion-badge">😊 Счастливый <span id="happyCount">0</span></span>
+                            <span class="emotion-badge">😢 Грустный <span id="sadCount">0</span></span>
+                            <span class="emotion-badge">😠 Злой <span id="angryCount">0</span></span>
+                            <span class="emotion-badge">😲 Удивленный <span id="surprisedCount">0</span></span>
+                            <span class="emotion-badge">😨 Испуганный <span id="fearfulCount">0</span></span>
+                            <span class="emotion-badge">🤢 Отвращенный <span id="disgustedCount">0</span></span>
+                            <span class="emotion-badge">😐 Нейтральный <span id="neutralCount">0</span></span>
+                        </div>
+                    </div>
+
+                    <div class="modal-buttons">
+                        <button onclick="closeModal()">Закрыть и начать заново</button>
+                        <button onclick="downloadHeatmap()">Сохранить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="gazeIndicator"></div>
+        <script src="game_script.js"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/heatmap.js/2.0.2/heatmap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+        </body>
 </html>

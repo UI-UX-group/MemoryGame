@@ -1,3 +1,5 @@
+let userID;
+
 const cardImages = Array.from({length: 12}, (_, i) => `images/${i+1}.png`);
 let cards = [], flippedCards = [], matchedPairs = 0, attempts = 0;
 let waitForMatch = false, gameActive = false;
@@ -13,11 +15,31 @@ let emotionStats = {
 let emotionEvents = [];
 let gameStartTime = null;
 
+//регистрация пользователя
+function showRules(){
+    const nameInput = document.getElementById('userID');
+    const name = nameInput.value.trim();
+
+    if (name === "") {
+        alert("Пожалуйста, введите ваш ID");
+        return;
+    }
+
+    userID = name;
+
+    // Скрываем окно регистрации
+    document.querySelector('.registration').style.display = 'none';
+
+    // Показываем правила
+    document.getElementById('rulesOverlay').style.display = 'flex';
+}
+
+
 // старт системы
 function startCalibration() {
     if (typeof webgazer === 'undefined') return alert('WebGazer не загружен!');
 
-    document.getElementById('calibrationOverlay').style.display = 'none';
+    document.getElementById('rulesOverlay').style.display = 'none';
     document.getElementById('videoMonitor').style.display = 'flex';
 
     webgazer.setRegression('ridge')
