@@ -8,11 +8,19 @@ let cardAttempts = {};
 
 let currentEmotion = 'neutral';
 let currentEmotionConfidence = 0;
-let emotionStats = {
-    happy: 0, sad: 0, angry: 0, surprised: 0,
-    fearful: 0, disgusted: 0, neutral: 0
+
+let emotionEvents = {
+    match: {
+        positive: 0,   // happy, surprised
+        neutral: 0,    // neutral
+        negative: 0    // sad, angry, fearful, disgusted
+    },
+    mismatch: {
+        positive: 0, // happy, surprised
+        neutral: 0, // neutral
+        negative: 0  // sad, angry, fearful, disgusted
+    }
 };
-let emotionEvents = [];
 let gameStartTime = null;
 
 //регистрация пользователя
@@ -214,11 +222,10 @@ function initGame() {
     matchedPairs = 0;
     gazeStats = {};
     cardAttempts = {};
-    emotionStats = {
-        happy: 0, sad: 0, angry: 0, surprised: 0,
-        fearful: 0, disgusted: 0, neutral: 0
+    emotionEvents = {
+        match: { positive: 0, neutral: 0, negative: 0 },
+        mismatch: { positive: 0, neutral: 0, negative: 0 }
     };
-    emotionEvents = [];
 
     gameStartTime = Date.now();
 
@@ -399,18 +406,15 @@ function FinishModal() {
 
     // эмоции
     const emotionBlock = document.getElementById('emotionStatsBlock');
-    if (emotionBlock) {
+    if (emotionBlock)
+    {
         emotionBlock.style.display = 'block';
-        document.getElementById('happyCount').innerText = emotionStats.happy || 0;
-        document.getElementById('sadCount').innerText = emotionStats.sad || 0;
-        document.getElementById('angryCount').innerText = emotionStats.angry || 0;
-        document.getElementById('surprisedCount').innerText = emotionStats.surprised || 0;
-        document.getElementById('fearfulCount').innerText = emotionStats.fearful || 0;
-        document.getElementById('disgustedCount').innerText = emotionStats.disgusted || 0;
-        document.getElementById('neutralCount').innerText = emotionStats.neutral || 0;
+        document.getElementById('happyCount').innerText = emotionEvents.match.positive +  emotionEvents.mismatch.positive || 0;
+        document.getElementById('neutralCount').innerText = emotionEvents.match.neutral +  emotionEvents.mismatch.neutral || 0;
+        document.getElementById('negativeCount').innerText = emotionEvents.match.negative +  emotionEvents.mismatch.negative || 0;
     }
+    downloadResults();
 }
-
 
 // закрытие окна
 function closeModal() {
@@ -418,41 +422,59 @@ function closeModal() {
     location.reload();
 }
 
-
-// сохранение скриншота и json файла с результатами эмоций
-function downloadHeatmap() {
+// сохранение скриншота и json файла с результатами эмоций в зип архив
+function downloadResults() {
     const container = document.getElementById('heatmap-result-container');
 
+    const zip = new JSZip();
     // сохранение тепловой карты
     html2canvas(container).then(canvas => {
-        const screenshotLink = document.createElement('a');
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const heatmapDataURL = canvas.toDataURL("image/png");
+        const heatmapBase64 = heatmapDataURL.split(',')[1];
+        zip.file(`heatmap_user_${userID}.png`, heatmapBase64, { base64: true });
 
-        screenshotLink.download = `heatmap-result-${timestamp}.png`;
-        screenshotLink.href = canvas.toDataURL("image/png");
-        screenshotLink.click();
+    const gameTimeFormatted = `${Math.floor((Date.now() - gameStartTime) / 60000)}:${Math.floor(((Date.now() - gameStartTime) % 60000) / 1000).toString().padStart(2, '0')}`;
 
+    const resultsData = {
+            time: gameTimeFormatted,
+            userID: userID,
+            emotionEvents: emotionEvents,
+        };
+
+    const jsonContent = JSON.stringify(resultsData, null, 2);
+    zip.file(`results_user_${userID}.json`, jsonContent);
+
+    zip.generateAsync({ type: "blob" }).then(function(content) {
+            const link = document.createElement('a');
+            link.download = `game_results_${userID}.zip`;
+            link.href = URL.createObjectURL(content);
+            link.click();
+            URL.revokeObjectURL(link.href);
+        });
+    }).catch(error => {
+        console.error('Ошибка при создании скриншота:', error);
+        alert('Не удалось сохранить скриншот');
     });
 
-    // сохранение json с эмоциями
-   const blob = new Blob([JSON.stringify({
-                gameTime: `${Math.floor((Date.now() - gameStartTime) / 60000)}:${Math.floor(((Date.now() - gameStartTime) % 60000) / 1000).toString().padStart(2, '0')}`,
-                emotionEvents: emotionEvents
-                }, null, 2)], { type: 'application/json' });
-    const link = document.createElement('a');
-    link.download = `emotion-events-${Date.now()}.json`;
-    link.href = URL.createObjectURL(blob);
-    link.click();
+}
+
+function classifyEmotion(emotion) {
+    const positive = ['happy', 'surprised'];
+    const negative = ['sad', 'angry', 'fearful', 'disgusted'];
+
+    if (positive.includes(emotion)) return 'positive';
+    if (negative.includes(emotion)) return 'negative';
+    return 'neutral'; // neutral
 }
 
 //эмоции
 function recordEmotionForEvent(eventType) {
     if (!gameActive) return;
 
-    emotionStats[currentEmotion] = (emotionStats[currentEmotion] || 0) + 1;
-
-    emotionEvents.push({
-        emotion: currentEmotion,
-        eventType: eventType
-    });
+    const valence = classifyEmotion(currentEmotion);
+    if (eventType === 'match') {
+        emotionEvents.match[valence]++;
+    } else if (eventType === 'mismatch') {
+        emotionEvents.mismatch[valence]++;
+    }
 }

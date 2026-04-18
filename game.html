@@ -44,7 +44,7 @@
                 <p>-Самая сложная и простая карты</p>
                 <p>-Эмоции, которые вы испытвали</p>
 
-                <p>Согласны проходить игру?</p>
+                <h1>Согласны проходить игру?</h1>
                 <div>
                     <button onclick="startCalibration()">Да</button>
                     <button onclick="closeModal()">Нет</button>
@@ -105,19 +105,13 @@
                     <div id="emotionStatsBlock" class="emotion-stats-block">
                         <strong>😊 Эмоции за игру:</strong><br>
                         <div class="emotion-badges">
-                            <span class="emotion-badge">😊 Счастливый <span id="happyCount">0</span></span>
-                            <span class="emotion-badge">😢 Грустный <span id="sadCount">0</span></span>
-                            <span class="emotion-badge">😠 Злой <span id="angryCount">0</span></span>
-                            <span class="emotion-badge">😲 Удивленный <span id="surprisedCount">0</span></span>
-                            <span class="emotion-badge">😨 Испуганный <span id="fearfulCount">0</span></span>
-                            <span class="emotion-badge">🤢 Отвращенный <span id="disgustedCount">0</span></span>
-                            <span class="emotion-badge">😐 Нейтральный <span id="neutralCount">0</span></span>
+                            <span class="emotion-badge">Позитивные эмоции <span id="happyCount">0</span></span>
+                            <span class="emotion-badge">Нейтральный <span id="neutralCount">0</span></span>
+                            <span class="emotion-badge">Негативные эмоции <span id="negativeCount">0</span></span>
                         </div>
                     </div>
-
                     <div class="modal-buttons">
-                        <button onclick="closeModal()">Закрыть и начать заново</button>
-                        <button onclick="downloadHeatmap()">Сохранить</button>
+                        <button onclick="closeModal()">Начать заново</button>
                     </div>
                 </div>
             </div>
@@ -128,5 +122,6 @@
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/heatmap.js/2.0.2/heatmap.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
         </body>
 </html>
