@@ -21,7 +21,13 @@ let emotionEvents = {
         negative: 0  // sad, angry, fearful, disgusted
     }
 };
+
 let gameStartTime = null;
+let timeToFind = []; // время между нахождением пар в миллисекундах
+
+let cntErrors = 0; //количество ошибок подряд
+let currentErrors = []; //эмоции в текущей серии ошибок
+let allErrors = []; // все списки эмоций при ошибке в игре
 
 //регистрация пользователя
 function showRules(){
@@ -41,7 +47,6 @@ function showRules(){
     // Показываем правила
     document.getElementById('rulesOverlay').style.display = 'flex';
 }
-
 
 // старт системы
 function startCalibration() {
@@ -228,6 +233,7 @@ function initGame() {
     };
 
     gameStartTime = Date.now();
+    timeToFind = [];
 
     document.getElementById('attempts').innerText = "0";
     document.getElementById('pairsFound').innerText = "0";
@@ -283,6 +289,12 @@ function handleCardClick(card, img) {
         document.getElementById('attempts').innerText = attempts;
 
         if (flippedCards[0].img === flippedCards[1].img) {
+            if (cntErrors >= 3)
+            {
+                allErrors.push([...currentErrors]);
+            }
+            cntErrors = 0;
+            currentErrors = [];
             setTimeout(() => {recordEmotionForEvent('match');}, 2000);
             matchedPairs++;
             document.getElementById('pairsFound').innerText = matchedPairs;
@@ -290,9 +302,24 @@ function handleCardClick(card, img) {
             flippedCards = [];
             waitForMatch = false;
             if (matchedPairs === 12) setTimeout(() => FinishModal(), 500);
+
+            if (timeToFind.length === 0)
+            {
+                timeToFind.push(Date.now() - gameStartTime);
+            }
+            else
+            {
+                const lastPairTime = timeToFind[timeToFind.length - 1];
+                const currentTime = Date.now() - gameStartTime;
+                timeToFind.push(currentTime - lastPairTime);
+            }
         }
         else {
+            cntErrors ++;
+
             setTimeout(() => {recordEmotionForEvent('mismatch');}, 2000);
+
+            currentErrors.push(currentEmotion);
             setTimeout(() => {
                 flippedCards.forEach(c => c.card.classList.remove('flipped'));
                 flippedCards = [];
@@ -436,9 +463,20 @@ function downloadResults() {
     const gameTimeFormatted = `${Math.floor((Date.now() - gameStartTime) / 60000)}:${Math.floor(((Date.now() - gameStartTime) % 60000) / 1000).toString().padStart(2, '0')}`;
 
     const resultsData = {
-            time: gameTimeFormatted,
-            userID: userID,
-            emotionEvents: emotionEvents,
+            userID: userID, // id игрока
+            time: gameTimeFormatted, // время прохождения
+
+            // для метрики точности //
+            pairs : matchedPairs, // количество пар
+            attempts : attempts, // количество попыток
+
+            // время нахождения последующей пары //
+            timeToFind : timeToFind,
+
+            // ухудшение эмоций //
+            emotionError : allErrors,
+            //ДОБАВИТЬ//
+            emotionEvents: emotionEvents, // эмоции при открытии пары
         };
 
     const jsonContent = JSON.stringify(resultsData, null, 2);
