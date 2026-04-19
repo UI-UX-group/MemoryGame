@@ -2,9 +2,9 @@ let currentRound = 1; // текуший раунд
 
 let revealTimeout = null; // таймер для скрытия карточек
 let roundExposureTimes = {
-    1: 1000,  // 1 раунд - 1000 мс
-    2: 350,   // 2 раунд - 500 мс
-    3: 1000   // 3 раунд - 1000 мс
+    1: 1300,  // 1 раунд - 1000 мс
+    2: 500,   // 2 раунд - 350 мс
+    3: 1300   // 3 раунд - 1000 мс
 };
 
 
@@ -606,10 +606,10 @@ function saveCurrentRoundResults() {
     roundResults[currentRound] = {
         attempts: attempts,
         matchedPairs: matchedPairs,
-        timeToFind: [...timeToFind], // копируем массив
+        timeToFind: [...timeToFind],
         roundTime: roundTime,
         roundTimeFormatted: timeFormatted,
-        emotionEvents: JSON.parse(JSON.stringify(emotionEvents)), // глубокое копирование
+        emotionEvents: JSON.parse(JSON.stringify(emotionEvents)),
         allErrors: [...allErrors],
         hesitationEvents: [...hesitationEvents],
         gazeStats: {...gazeStats},
