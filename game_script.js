@@ -3,7 +3,7 @@ let currentRound = 1; // текуший раунд
 let revealTimeout = null; // таймер для скрытия карточек
 let roundExposureTimes = {
     1: 1000,  // 1 раунд - 1000 мс
-    2: 500,   // 2 раунд - 500 мс
+    2: 350,   // 2 раунд - 500 мс
     3: 1000   // 3 раунд - 1000 мс
 };
 
@@ -72,6 +72,10 @@ function showRules(){
 // старт системы
 function startCalibration() {
     if (typeof webgazer === 'undefined') return alert('WebGazer не загружен!');
+
+    if (typeof webgazer.params !== 'undefined') {
+        webgazer.params.mediaPipePath = './mediapipe/face_mesh/';
+    }
 
     document.getElementById('rulesOverlay').style.display = 'none';
     document.getElementById('videoMonitor').style.display = 'flex';
