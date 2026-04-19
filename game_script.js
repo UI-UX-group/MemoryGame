@@ -389,7 +389,7 @@ function handleCardClick(card, img) {
             cntErrors ++;
 
             const hoverDuration = Date.now() - hoverStartTime;
-            if (hoverDuration >= 1500 ){
+            if (hoverDuration >= 1500 && hoverDuration < 1600 ){
                 hesitationEvents.push(hoverDuration)
             }
             setTimeout(() => {recordEmotionForEvent('mismatch');}, 2000);
