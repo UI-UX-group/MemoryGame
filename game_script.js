@@ -1,4 +1,13 @@
 let currentRound = 1; // текуший раунд
+
+let revealTimeout = null; // таймер для скрытия карточек
+let roundExposureTimes = {
+    1: 1000,  // 1 раунд - 1000 мс
+    2: 500,   // 2 раунд - 500 мс
+    3: 1000   // 3 раунд - 1000 мс
+};
+
+
 let roundResults = {
     1:{ attempts: 0, timeToFind: [], roundTime: 0 },
     2:{ attempts: 0, timeToFind: [], roundTime: 0 },
@@ -251,6 +260,7 @@ function finishCalibration() {
 
 // инициализация игры
 function initGame() {
+    // Сбрасываем игровые переменные для нового раунда
     attempts = 0;
     matchedPairs = 0;
     gazeStats = {};
@@ -262,19 +272,23 @@ function initGame() {
 
     gameStartTime = Date.now();
     timeToFind = [];
-
-    document.getElementById('attempts').innerText = "0";
-    document.getElementById('pairsFound').innerText = "0";
-
-    document.getElementById('roundIndicator').innerText = `${currentRound}`;
-
     cntErrors = 0;
     currentErrors = [];
+    allErrors = [];
     hesitationEvents = [];
-    timeToFind = [];
+    isRoundFinished = false;
 
+    // Обновляем отображение на экране
+    document.getElementById('attempts').innerText = "0";
+    document.getElementById('pairsFound').innerText = "0";
+    document.getElementById('roundIndicator').innerText = currentRound;
+
+    // Перемешиваем карты
     cards = [...cardImages, ...cardImages].sort(() => Math.random() - 0.5);
     renderBoard();
+
+    // Сообщаем игроку о начале раунда
+    showRoundStartMessage();
 
     webgazer.resume();
 }
@@ -339,7 +353,22 @@ function handleCardClick(card, img) {
             flippedCards.forEach(c => c.card.classList.add('matched'));
             flippedCards = [];
             waitForMatch = false;
-            if (matchedPairs === 12) setTimeout(() => FinishModal(), 500);
+            if (matchedPairs === 12)
+            {
+                saveCurrentRoundResults();
+                if (currentRound < 3) {
+                // Переходим к следующему раунду
+                currentRound++;
+                setTimeout(() => {
+                    startNextRound();
+                }, 2000);
+                } else {
+                    // Все 3 раунда завершены
+                    setTimeout(() => {
+                        finishAllRounds();
+                    }, 1000);
+                }
+            }
 
             if (timeToFind.length === 0)
             {
@@ -365,7 +394,7 @@ function handleCardClick(card, img) {
                 flippedCards.forEach(c => c.card.classList.remove('flipped'));
                 flippedCards = [];
                 waitForMatch = false;
-            }, 1000);
+            }, roundExposureTimes[currentRound]);
         }
     }
 }
@@ -393,21 +422,15 @@ function closeModal() {
 
 // сохранение скриншота и json файла с результатами эмоций в зип архив
 function downloadResults() {
-    const container = document.getElementById('heatmap-result-container');
-
-     const surveyData = {
+    const surveyData = {
         userID: userID,
         timestamp: new Date().toISOString(),
-
-        // Когнитивная нагрузка
         easierEachRound: document.querySelector('input[name="easierEachRound"]:checked')?.value || null,
         strategyMoment: document.querySelector('select[name="strategyMoment"]')?.value || null,
         changedApproach: document.querySelector('input[name="changedApproach"]:checked')?.value || null,
         difficulty: document.querySelector('input[name="difficulty"]:checked')?.value || null,
         multiTask: document.querySelector('input[name="multiTask"]:checked')?.value || null,
         slowReaction: document.querySelector('input[name="slowReaction"]:checked')?.value || null,
-
-        // Эмоциональное состояние
         excitement: document.querySelector('input[name="excitement"]:checked')?.value || null,
         frustration: document.querySelector('input[name="frustration"]:checked')?.value || null,
         wantContinue: document.querySelector('input[name="wantContinue"]:checked')?.value || null,
@@ -415,6 +438,29 @@ function downloadResults() {
 
     const zip = new JSZip();
 
+    // Сначала добавляем JSON данные
+    const completeGameData = {
+        userID: userID,
+        timestamp: new Date().toISOString(),
+        rounds: roundResults
+    };
+
+    zip.file(`game_results_${userID}.json`, JSON.stringify(completeGameData, null, 2));
+    zip.file(`survey_${userID}.json`, JSON.stringify(surveyData, null, 2));
+
+    // Проверяем, существует ли элемент board
+    const board = document.getElementById('board');
+    if (!board) {
+        console.error('Board не найден');
+        generateZip(zip);
+        return;
+    }
+
+    // Создаём тепловую карту и только потом ZIP
+    createHeatmapAndDownload(zip);
+}
+
+function createHeatmapAndDownload(zip) {
     const hiddenContainer = document.createElement('div');
     hiddenContainer.style.position = 'absolute';
     hiddenContainer.style.left = '-9999px';
@@ -423,7 +469,14 @@ function downloadResults() {
     hiddenContainer.style.height = '500px';
     document.body.appendChild(hiddenContainer);
 
-    // Создаём тепловую карту
+    // Проверяем, загружена ли библиотека heatmap
+    if (typeof h337 === 'undefined') {
+        console.error('Heatmap.js не загружен');
+        generateZip(zip);
+        hiddenContainer.remove();
+        return;
+    }
+
     const heatmapInstance = h337.create({
         container: hiddenContainer,
         radius: 50,
@@ -452,59 +505,44 @@ function downloadResults() {
     });
 
     heatmapInstance.setData({
-        max: maxVal,
+        max: maxVal || 1,
         data: points
     });
 
-
-    // сохранение тепловой карты
-    html2canvas(hiddenContainer).then(canvas => {
-        const heatmapDataURL = canvas.toDataURL("image/png");
-        const heatmapBase64 = heatmapDataURL.split(',')[1];
-        zip.file(`heatmap_user_${userID}.png`, heatmapBase64, { base64: true });
-
-    hiddenContainer.remove();
-
-    const gameTimeFormatted = `${Math.floor((Date.now() - gameStartTime) / 60000)}:${Math.floor(((Date.now() - gameStartTime) % 60000) / 1000).toString().padStart(2, '0')}`;
-
-    const resultsData = {
-            userID: userID, // id игрока
-            time: gameTimeFormatted, // время прохождения
-
-            // для метрики точности //
-            pairs : matchedPairs, // количество пар
-            attempts : attempts, // количество попыток
-
-            // время нахождения последующей пары //
-            timeToFind : timeToFind,
-
-            // ухудшение эмоций //
-            emotionError : allErrors,
-
-            //время на сомнения //
-            hesitationEvents : hesitationEvents,
-            emotionEvents: emotionEvents, // эмоции при открытии пары
-        };
-
-    const jsonContent = JSON.stringify(resultsData, null, 2);
-    zip.file(`results_user_${userID}.json`, jsonContent);
-
-
-     const surveyContent = JSON.stringify(surveyData, null, 2);
-     zip.file(`survey_user_${userID}.json`, surveyContent);
-
-    zip.generateAsync({ type: "blob" }).then(function(content) {
-            const link = document.createElement('a');
-            link.download = `game_results_${userID}.zip`;
-            link.href = URL.createObjectURL(content);
-            link.click();
-            URL.revokeObjectURL(link.href);
+    // Ждём отрисовки тепловой карты
+    setTimeout(() => {
+        html2canvas(hiddenContainer, {
+            scale: 1,
+            useCORS: true,
+            logging: false
+        }).then(canvas => {
+            const heatmapDataURL = canvas.toDataURL("image/png");
+            const heatmapBase64 = heatmapDataURL.split(',')[1];
+            zip.file(`heatmap_user_${userID}.png`, heatmapBase64, { base64: true });
+            hiddenContainer.remove();
+            generateZip(zip);
+        }).catch(error => {
+            console.error('Ошибка html2canvas:', error);
+            hiddenContainer.remove();
+            generateZip(zip);
         });
-    }).catch(error => {
-        console.error('Ошибка при создании скриншота:', error);
-        alert('Не удалось сохранить скриншот');
-    });
+    }, 500);
+}
 
+function generateZip(zip) {
+    zip.generateAsync({ type: "blob" }).then(function(content) {
+        const link = document.createElement('a');
+        link.download = `game_results_${userID}.zip`;
+        link.href = URL.createObjectURL(content);
+        link.click();
+        URL.revokeObjectURL(link.href);
+
+        // Показываем сообщение об успешном сохранении
+        alert('Результаты успешно сохранены!');
+    }).catch(error => {
+        console.error('Ошибка создания ZIP:', error);
+        alert('Ошибка при сохранении результатов');
+    });
 }
 
 function classifyEmotion(emotion) {
@@ -527,3 +565,102 @@ function recordEmotionForEvent(eventType) {
         emotionEvents.mismatch[valence]++;
     }
 }
+
+
+//сообщение о начале раунда
+function showRoundStartMessage() {
+    const msgDiv = document.createElement('div');
+    msgDiv.textContent = `Раунд ${currentRound} из 3`;
+    msgDiv.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.85);
+        color: white;
+        padding: 20px 40px;
+        border-radius: 15px;
+        font-size: 28px;
+        font-weight: bold;
+        z-index: 20000;
+        text-align: center;
+        font-family: sans-serif;
+    `;
+    document.body.appendChild(msgDiv);
+
+    setTimeout(() => {
+        if (msgDiv && msgDiv.parentNode) {
+            msgDiv.remove();
+        }
+    }, 1500);
+}
+
+function saveCurrentRoundResults() {
+    const roundTime = Date.now() - gameStartTime;
+    const timeFormatted = `${Math.floor(roundTime / 60000)}:${Math.floor((roundTime % 60000) / 1000).toString().padStart(2, '0')}`;
+
+    roundResults[currentRound] = {
+        attempts: attempts,
+        matchedPairs: matchedPairs,
+        timeToFind: [...timeToFind], // копируем массив
+        roundTime: roundTime,
+        roundTimeFormatted: timeFormatted,
+        emotionEvents: JSON.parse(JSON.stringify(emotionEvents)), // глубокое копирование
+        allErrors: [...allErrors],
+        hesitationEvents: [...hesitationEvents],
+        gazeStats: {...gazeStats},
+        cardAttempts: {...cardAttempts}
+    };
+
+    console.log(`Раунд ${currentRound} завершён! Попыток: ${attempts}, Время: ${timeFormatted}`);
+}
+
+
+function startNextRound() {
+    // Очищаем игровую доску
+    const board = document.getElementById('board');
+    board.innerHTML = '';
+
+    // Сбрасываем временные переменные
+    flippedCards = [];
+    waitForMatch = false;
+
+    // Запускаем новый раунд
+    initGame();
+}
+
+function finishAllRounds() {
+    gameActive = false;
+    webgazer.pause();
+
+    // Показываем сообщение о завершении игры
+    const msgDiv = document.createElement('div');
+    msgDiv.textContent = `Игра завершена! Спасибо за участие!`;
+    msgDiv.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.85);
+        color: white;
+        padding: 20px 40px;
+        border-radius: 15px;
+        font-size: 24px;
+        font-weight: bold;
+        z-index: 20000;
+        text-align: center;
+    `;
+    document.body.appendChild(msgDiv);
+
+    setTimeout(() => {
+        if (msgDiv && msgDiv.parentNode) {
+            msgDiv.remove();
+        }
+        // Показываем форму опроса
+        document.getElementById('result-modal').style.display = 'block';
+    }, 2000);
+}
+
+
+
+
