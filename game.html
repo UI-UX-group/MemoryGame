@@ -31,18 +31,15 @@
                 <p>Перед вами на экране высветится <b>9</b> красных точек на каждую из них надо нажать <b>5 раз</b></p>
                 <p>После нажатия на точки, нужно посмотреть на центр экрана <b>2 секунды</b></p>
 
-                <h2>Этап 2: Игра </h2>
+                <h2>Этап 2: Игра (НЕСКОЛЬКО ШТУК)</h2>
                 <p>Перед вами будет <b>24 карты</b> это <b>12 пар</b></p>
                 <p>Ваша цель - найти пары одинаковых карт</p>
                 <p>За один ход вы можете открыть две карты</p>
                 <p>Если они <b>совпали</b>, то они остаются открытыми и выходят из игры</p>
                 <p>Если <b>не совпали</b>, то они переворачиваются обратно и остаются в игре</p>
 
-                <h2>Этап 3: Результаты </h2>
-                <p>После прохождения игры Вам покажут ваши результаты игры:</p>
-                <p>-Тепловая карта вашего взгляда</p>
-                <p>-Самая сложная и простая карты</p>
-                <p>-Эмоции, которые вы испытвали</p>
+                <h2>Этап 3: Опрос </h2>
+                <p>После прохождения игры Вам надо будет пройти небольшой опрос:</p>
 
                 <h1>Согласны проходить игру?</h1>
                 <div>
@@ -66,8 +63,7 @@
         </div>
 
         <div class="game-container" id="gameContainer" style="display: none;">
-            <h1>Мемо: Найди пару</h1>
-
+            <h1>Мемо: Найди пару. Раунд: <span id="roundIndicator">1</span></h1>
             <div class="stats">
                 <div>Попытки: <span id="attempts">0</span></div>
                 <div>Пары: <span id="pairsFound">0</span> / <span id="totalPairs">12</span></div>
@@ -77,51 +73,87 @@
 
             <div id="result-modal" class="modal">
                 <div class="modal-content">
-                    <h2>Результаты игры</h2>
-
-                    <h2>Вы прошли игру за <span id="gameTimeValue"></span></h2>
-                    <div id="heatmap-result-container"></div>
-
-                    <!-- Статистика карт -->
-                    <div id="difficultyStatsBlock" class="difficulty-stats-block">
-                        <strong>Сложность карт:</strong><br><br>
-                        <div class="difficulty-cards-container">
-                            <div class="difficulty-card">
-                                <div class="difficulty-card-title">Самая сложная</div>
-                                <div id="hardestCardImage" class="card-image-container hard-card-border"></div>
-                                <div id="hardestCardId" class="card-id">Карта ?</div>
-                                <div id="hardestCardAttempts" class="card-attempts">0 попыток</div>
-                            </div>
-                            <div class="difficulty-card">
-                                <div class="difficulty-card-title">Самая простая</div>
-                                <div id="easiestCardImage" class="card-image-container easy-card-border"></div>
-                                <div id="easiestCardId" class="card-id">Карта ?</div>
-                                <div id="easiestCardAttempts" class="card-attempts">0 попыток</div>
-                            </div>
-                        </div>
+                    <p><strong>1.</strong> Вам казалось, что каждый следующий раунд давался легче?</p>
+                    <div style="display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap;">
+                    <label><input type="radio" name="easierEachRound" value="1"> 1</label>
+                    <label><input type="radio" name="easierEachRound" value="2"> 2</label>
+                    <label><input type="radio" name="easierEachRound" value="3"> 3</label>
+                    <label><input type="radio" name="easierEachRound" value="4"> 4</label>
+                    <label><input type="radio" name="easierEachRound" value="5"> 5</label>
                     </div>
 
-                    <!-- эмоции -->
-                    <div id="emotionStatsBlock" class="emotion-stats-block">
-                        <strong>😊 Эмоции за игру:</strong><br>
-                        <div class="emotion-badges">
-                            <span class="emotion-badge">Позитивные эмоции <span id="happyCount">0</span></span>
-                            <span class="emotion-badge">Нейтральный <span id="neutralCount">0</span></span>
-                            <span class="emotion-badge">Негативные эмоции <span id="negativeCount">0</span></span>
-                        </div>
-                    </div>
-                    <div class="modal-buttons">
-                        <button onclick="closeModal()">Начать заново</button>
-                    </div>
+                    <p><strong>2.</strong> В какой момент вы почувствовали, что поняли «стратегию» поиска?</p>
+                    <div style="display: flex; margin-bottom: 15px;">
+                    <select name="strategyMoment" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #ddd;">
+                        <option value="">Выберите вариант...</option>
+                        <option value="never">Так и не понял(а)</option>
+                        <option value="after_first_match">После первой найденной пары</option>
+                        <option value="after_several_matches">После 3-4 найденных пар</option>
+                        <option value="middle_game">В середине игры</option>
+                        <option value="end_game">Только в конце игры</option>
+                    </select>
+                </div>
+
+                    <p><strong>3.</strong> Вы сознательно меняли подход к поиску от раунда к раунду?</p>
+                    <div style="display: flex; margin-bottom: 15px;">
+                    <label><input type="radio" name="changedApproach" value="yes"> Да</label>
+                    <label style="margin-left: 15px;"><input type="radio" name="changedApproach" value="no"> Нет</label>
+                </div>
+
+                    <p><strong>4.</strong> Насколько сложной показалась игра? (1 — очень легко, 5 — очень сложно)</p>
+                    <div style="display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap;">
+                    <label><input type="radio" name="difficulty" value="1"> 1</label>
+                    <label><input type="radio" name="difficulty" value="2"> 2</label>
+                    <label><input type="radio" name="difficulty" value="3"> 3</label>
+                    <label><input type="radio" name="difficulty" value="4"> 4</label>
+                    <label><input type="radio" name="difficulty" value="5"> 5</label>
+                </div>
+
+                    <p><strong>5.</strong> Вам приходилось удерживать в голове несколько вещей одновременно? (1 — никогда, 5 — постоянно)</p>
+                    <div style="display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap;">
+                    <label><input type="radio" name="multiTask" value="1"> 1</label>
+                    <label><input type="radio" name="multiTask" value="2"> 2</label>
+                    <label><input type="radio" name="multiTask" value="3"> 3</label>
+                    <label><input type="radio" name="multiTask" value="4"> 4</label>
+                    <label><input type="radio" name="multiTask" value="5"> 5</label>
+                </div>
+
+                    <p><strong>6.</strong> Вы чувствовали, что не успеваете реагировать?</p>
+                    <div style="display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap;">
+                    <label><input type="radio" name="slowReaction" value="yes"> Да</label>
+                    <label style="margin-left: 15px;"><input type="radio" name="slowReaction" value="no"> Нет</label>
+                </div>
+
+                    <p><strong>7.</strong> Вы испытывали азарт во время игры? (1 — нет, 5 — очень сильный)</p>
+                    <div style="display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap;">
+                    <label><input type="radio" name="excitement" value="1"> 1</label>
+                    <label><input type="radio" name="excitement" value="2"> 2</label>
+                    <label><input type="radio" name="excitement" value="3"> 3</label>
+                    <label><input type="radio" name="excitement" value="4"> 4</label>
+                    <label><input type="radio" name="excitement" value="5"> 5</label>
+                </div>
+
+                    <p><strong>8.</strong> Вы злились или расстраивались при неудаче?</p>
+                    <div style="display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap;">
+                    <label><input type="radio" name="frustration" value="yes"> Да</label>
+                    <label style="margin-left: 15px;"><input type="radio" name="frustration" value="no"> Нет</label>
+                </div>
+
+                    <p><strong>9.</strong> Вам хотелось продолжить игру после завершения?</p>
+                    <div style="display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap;">
+                    <label><input type="radio" name="wantContinue" value="yes"> Да</label>
+                    <label style="margin-left: 15px;"><input type="radio" name="wantContinue" value="no"> Нет</label>
+                </div>
                 </div>
             </div>
         </div>
 
         <div id="gazeIndicator"></div>
-        <script src="game_script.js"></script>
+
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/heatmap.js/2.0.2/heatmap.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+        <script src="game_script.js"></script>
         </body>
 </html>

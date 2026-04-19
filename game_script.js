@@ -1,3 +1,10 @@
+let currentRound = 1; // текуший раунд
+let roundResults = {
+    1:{ attempts: 0, timeToFind: [], roundTime: 0 },
+    2:{ attempts: 0, timeToFind: [], roundTime: 0 },
+    3:{ attempts: 0, timeToFind: [], roundTime: 0 }
+}
+
 let userID;
 
 const cardImages = Array.from({length: 12}, (_, i) => `images/${i+1}.png`);
@@ -29,6 +36,11 @@ let cntErrors = 0; //количество ошибок подряд
 let currentErrors = []; //эмоции в текущей серии ошибок
 let allErrors = []; // все списки эмоций при ошибке в игре
 
+
+let currerntCardId = null; // карта, которая сейчас открыта
+let currentHoverCard = null; // карта, на которую смотрит пользователь
+let hoverStartTime = null; // время, когда пользователь начал смотреть на карту
+let hesitationEvents = []; // все сомнения
 //регистрация пользователя
 function showRules(){
     const nameInput = document.getElementById('userID');
@@ -207,6 +219,22 @@ function trackGazeOnCards(x, y) {
     if (card) {
         const index = card.dataset.index;
         gazeStats[index] = (gazeStats[index] || 0) + 1;
+
+        const cardId = card.dataset.id;
+        const isFlipped = card.classList.contains('flipped');
+        const isMatched = card.classList.contains('matched');
+
+        if (flippedCards.length === 1 && !isFlipped && !isMatched){
+            const openedCardId = flippedCards[0].cardId;
+            if (cardId === openedCardId) {
+
+                //начали смотреть на правильную карту
+                if (currentHoverCard !== cardId) {
+                    currentHoverCard = cardId;
+                    hoverStartTime = Date.now();
+                }
+            }
+        }
     }
 }
 
@@ -238,8 +266,16 @@ function initGame() {
     document.getElementById('attempts').innerText = "0";
     document.getElementById('pairsFound').innerText = "0";
 
+    document.getElementById('roundIndicator').innerText = `${currentRound}`;
+
+    cntErrors = 0;
+    currentErrors = [];
+    hesitationEvents = [];
+    timeToFind = [];
+
     cards = [...cardImages, ...cardImages].sort(() => Math.random() - 0.5);
     renderBoard();
+
     webgazer.resume();
 }
 
@@ -295,6 +331,8 @@ function handleCardClick(card, img) {
             }
             cntErrors = 0;
             currentErrors = [];
+
+
             setTimeout(() => {recordEmotionForEvent('match');}, 2000);
             matchedPairs++;
             document.getElementById('pairsFound').innerText = matchedPairs;
@@ -316,7 +354,10 @@ function handleCardClick(card, img) {
         }
         else {
             cntErrors ++;
-
+            const hoverDuration = Date.now() - hoverStartTime;
+            if (hoverDuration >= 1000 && hoverDuration < 1100){
+                hesitationEvents.push(hoverDuration)
+            }
             setTimeout(() => {recordEmotionForEvent('mismatch');}, 2000);
 
             currentErrors.push(currentEmotion);
@@ -341,24 +382,50 @@ function updateGazeIndicator(x, y) {
 // отрисовка финального окна с результатами
 function FinishModal() {
     gameActive = false;
+    document.getElementById('result-modal').style.display = 'block';
+}
 
-    let gameTime = 0;
-    let gameTimeFormatted = "00:00";
-    gameTime = Date.now() - gameStartTime;
-    const totalSeconds = Math.floor(gameTime / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    gameTimeFormatted = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    document.getElementById('gameTimeValue').innerText = gameTimeFormatted;
+// закрытие окна
+function closeModal() {
+    document.getElementById('result-modal').style.display = 'none';
+    location.reload();
+}
 
-    const modal = document.getElementById('result-modal');
+// сохранение скриншота и json файла с результатами эмоций в зип архив
+function downloadResults() {
     const container = document.getElementById('heatmap-result-container');
 
-    modal.style.display = 'block';
-    container.innerHTML = '';
+     const surveyData = {
+        userID: userID,
+        timestamp: new Date().toISOString(),
 
+        // Когнитивная нагрузка
+        easierEachRound: document.querySelector('input[name="easierEachRound"]:checked')?.value || null,
+        strategyMoment: document.querySelector('select[name="strategyMoment"]')?.value || null,
+        changedApproach: document.querySelector('input[name="changedApproach"]:checked')?.value || null,
+        difficulty: document.querySelector('input[name="difficulty"]:checked')?.value || null,
+        multiTask: document.querySelector('input[name="multiTask"]:checked')?.value || null,
+        slowReaction: document.querySelector('input[name="slowReaction"]:checked')?.value || null,
+
+        // Эмоциональное состояние
+        excitement: document.querySelector('input[name="excitement"]:checked')?.value || null,
+        frustration: document.querySelector('input[name="frustration"]:checked')?.value || null,
+        wantContinue: document.querySelector('input[name="wantContinue"]:checked')?.value || null,
+    };
+
+    const zip = new JSZip();
+
+    const hiddenContainer = document.createElement('div');
+    hiddenContainer.style.position = 'absolute';
+    hiddenContainer.style.left = '-9999px';
+    hiddenContainer.style.top = '-9999px';
+    hiddenContainer.style.width = '500px';
+    hiddenContainer.style.height = '500px';
+    document.body.appendChild(hiddenContainer);
+
+    // Создаём тепловую карту
     const heatmapInstance = h337.create({
-        container: container,
+        container: hiddenContainer,
         radius: 50,
         maxOpacity: .6,
         blur: .8
@@ -376,8 +443,8 @@ function FinishModal() {
         if (count > 0) {
             const rect = card.getBoundingClientRect();
             points.push({
-                x: Math.floor((rect.left - boardRect.left + rect.width / 2) / boardRect.width * container.offsetWidth),
-                y: Math.floor((rect.top - boardRect.top + rect.height / 2) / boardRect.height * container.offsetHeight),
+                x: Math.floor((rect.left - boardRect.left + rect.width / 2) / boardRect.width * hiddenContainer.offsetWidth),
+                y: Math.floor((rect.top - boardRect.top + rect.height / 2) / boardRect.height * hiddenContainer.offsetHeight),
                 value: count
             });
             if (count > maxVal) maxVal = count;
@@ -389,76 +456,14 @@ function FinishModal() {
         data: points
     });
 
-    // находим самые простые и сложные карты
-    let maxAttempts = 0;
-    let minAttempts = Infinity;
-    let hardestCardId = -1;
-    let easiestCardId = -1;
 
-    for (let id = 1; id <= 12; id++) {
-        const attemptsCount = cardAttempts[id] || 0;
-        if (attemptsCount > maxAttempts) {
-            maxAttempts = attemptsCount;
-            hardestCardId = id;
-        }
-        if (attemptsCount < minAttempts && attemptsCount > 0) {
-            minAttempts = attemptsCount;
-            easiestCardId = id;
-        }
-    }
-
-    const hardestCardImage = hardestCardId !== -1 ? `images/${hardestCardId}.png` : '';
-    const easiestCardImage = easiestCardId !== -1 ? `images/${easiestCardId}.png` : '';
-
-    const difficultyBlock = document.getElementById('difficultyStatsBlock');
-    if (difficultyBlock) {
-        difficultyBlock.style.display = 'block';
-
-        // самая сложная карта
-        const hardestImgDiv = document.getElementById('hardestCardImage');
-        if (hardestImgDiv && hardestCardImage) {
-            hardestImgDiv.innerHTML = `<img src="${hardestCardImage}" style="max-width: 100%; max-height: 100%; object-fit: contain;" onerror="this.innerHTML='❓'">`;
-        }
-        document.getElementById('hardestCardId').innerHTML = `Карта ${hardestCardId}`;
-        document.getElementById('hardestCardAttempts').innerHTML = `${maxAttempts} попыток`;
-
-        // самая простая карта
-        const easiestImgDiv = document.getElementById('easiestCardImage');
-        if (easiestImgDiv && easiestCardImage) {
-            easiestImgDiv.innerHTML = `<img src="${easiestCardImage}" style="max-width: 100%; max-height: 100%; object-fit: contain;" onerror="this.innerHTML='❓'">`;
-        }
-        document.getElementById('easiestCardId').innerHTML = `Карта ${easiestCardId}`;
-        document.getElementById('easiestCardAttempts').innerHTML = `${minAttempts === Infinity ? 0 : minAttempts} попыток`;
-    }
-
-    // эмоции
-    const emotionBlock = document.getElementById('emotionStatsBlock');
-    if (emotionBlock)
-    {
-        emotionBlock.style.display = 'block';
-        document.getElementById('happyCount').innerText = emotionEvents.match.positive +  emotionEvents.mismatch.positive || 0;
-        document.getElementById('neutralCount').innerText = emotionEvents.match.neutral +  emotionEvents.mismatch.neutral || 0;
-        document.getElementById('negativeCount').innerText = emotionEvents.match.negative +  emotionEvents.mismatch.negative || 0;
-    }
-    downloadResults();
-}
-
-// закрытие окна
-function closeModal() {
-    document.getElementById('result-modal').style.display = 'none';
-    location.reload();
-}
-
-// сохранение скриншота и json файла с результатами эмоций в зип архив
-function downloadResults() {
-    const container = document.getElementById('heatmap-result-container');
-
-    const zip = new JSZip();
     // сохранение тепловой карты
-    html2canvas(container).then(canvas => {
+    html2canvas(hiddenContainer).then(canvas => {
         const heatmapDataURL = canvas.toDataURL("image/png");
         const heatmapBase64 = heatmapDataURL.split(',')[1];
         zip.file(`heatmap_user_${userID}.png`, heatmapBase64, { base64: true });
+
+    hiddenContainer.remove();
 
     const gameTimeFormatted = `${Math.floor((Date.now() - gameStartTime) / 60000)}:${Math.floor(((Date.now() - gameStartTime) % 60000) / 1000).toString().padStart(2, '0')}`;
 
@@ -475,12 +480,18 @@ function downloadResults() {
 
             // ухудшение эмоций //
             emotionError : allErrors,
-            //ДОБАВИТЬ//
+
+            //время на сомнения //
+            hesitationEvents : hesitationEvents,
             emotionEvents: emotionEvents, // эмоции при открытии пары
         };
 
     const jsonContent = JSON.stringify(resultsData, null, 2);
     zip.file(`results_user_${userID}.json`, jsonContent);
+
+
+     const surveyContent = JSON.stringify(surveyData, null, 2);
+     zip.file(`survey_user_${userID}.json`, surveyContent);
 
     zip.generateAsync({ type: "blob" }).then(function(content) {
             const link = document.createElement('a');
