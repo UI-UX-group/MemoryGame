@@ -1,5 +1,5 @@
 let currentRound = 1; // текуший раунд
-
+let isRoundFinished = false;
 let revealTimeout = null; // таймер для скрытия карточек
 let roundExposureTimes = {
     1: 1300,  // 1 раунд - 1000 мс
@@ -388,10 +388,13 @@ function handleCardClick(card, img) {
         else {
             cntErrors ++;
             const hoverDuration = Date.now() - hoverStartTime;
-            if (hoverDuration >= 1000 && hoverDuration < 1100){
+            if (hoverDuration >= 1000 ){
                 hesitationEvents.push(hoverDuration)
             }
             setTimeout(() => {recordEmotionForEvent('mismatch');}, 2000);
+
+            currentHoverCard = null;
+            hoverStartTime = null;
 
             currentErrors.push(currentEmotion);
             setTimeout(() => {
