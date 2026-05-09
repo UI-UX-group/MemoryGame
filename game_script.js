@@ -3,7 +3,7 @@ let isRoundFinished = false;
 let revealTimeout = null; // таймер для скрытия карточек
 let roundExposureTimes = {
     1: 1300,  // 1 раунд - 1000 мс
-    2: 500,   // 2 раунд - 350 мс
+    2: 500,   // 2 раунд - 500 мс
     3: 1300   // 3 раунд - 1000 мс
 };
 
