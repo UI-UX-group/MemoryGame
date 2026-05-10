@@ -45,7 +45,8 @@ python -m http.server 8000
 5. Находите пары одинаковых карточек
 6. После прохождения 3 раундов пройдите опрос и сохраните результат
 
-## Структура проекта 
+## Структура проекта
+```
 ├── images/               # Изображения карточек
 ├── mediapipe/            # MediaPipe для WebGazer
 ├── models/               # Модели для FaceAPI
@@ -56,7 +57,7 @@ python -m http.server 8000
 ├── registration.js       # Регистрация
 ├── results.js            # Экспорт результатов
 └── style_game.css        # Стили
-
+```
 
 ## Автор 
 Полина Долгая – dolgayapolina
