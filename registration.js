@@ -1,4 +1,4 @@
-// registration.js
+//показ правил игры после ввода id пользователя
 function showRules() {
     const nameInput = document.getElementById('userID');
     const name = nameInput.value.trim();
@@ -14,6 +14,7 @@ function showRules() {
     document.getElementById('rulesOverlay').style.display = 'flex';
 }
 
+//закрытие и переход на начальну страницу
 function closeModal() {
     document.getElementById('result-modal').style.display = 'none';
     location.reload();

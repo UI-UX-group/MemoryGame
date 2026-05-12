@@ -1,9 +1,9 @@
-// calibration.js
-
 // старт системы
 function startCalibration() {
+    //проверяем загрузку библиотеки
     if (typeof webgazer === 'undefined') return alert('WebGazer не загружен!');
 
+    // путь к файлам для распознавания лица
     if (typeof webgazer.params !== 'undefined') {
         webgazer.params.mediaPipePath = './mediapipe/face_mesh/';
     }
@@ -11,23 +11,23 @@ function startCalibration() {
     document.getElementById('rulesOverlay').style.display = 'none';
     document.getElementById('videoMonitor').style.display = 'flex';
 
-    webgazer.setRegression('ridge')
+    webgazer.setRegression('ridge') //метод регрессии для предсказания
         .setGazeListener((data, timestamp) => {
             if (data) {
                 updateGazeIndicator(data.x, data.y);
                 if (window.gameActive) trackGazeOnCards(data.x, data.y);
             }
         })
-        .begin()
+        .begin() //запуск webGazer
         .then(() => {
             webgazer.showVideo(true).showPredictionPoints(false);
             setupVideoLayout();
             startFaceAPI();
-            createCalibrationPoints();
+            createCalibrationPoints(); //создание 9 точек калибровки
         });
 }
 
-// монитор WebGazer
+// размещение монитора WebGazer
 function setupVideoLayout() {
     setTimeout(() => {
         const wgContainer = document.getElementById('webgazerVideoContainer');
@@ -44,6 +44,7 @@ function setupVideoLayout() {
 
 // настройка faceAPI
 async function startFaceAPI() {
+    //загрузка моделей для распознавания точек лица и его выражения
     await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
     await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
     await faceapi.nets.faceExpressionNet.loadFromUri('/models');
@@ -65,11 +66,13 @@ async function startFaceAPI() {
             const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceExpressions();
             if (detection) {
                 const expressions = detection.expressions;
+                //определение эмоции
                 const dominant = Object.entries(expressions).reduce((a,b) => a[1] > b[1] ? a : b)[0];
 
                 window.currentEmotion = dominant;
                 window.currentEmotionConfidence = expressions[dominant];
 
+                //отображение эмоции на экране
                 const faceValues = document.getElementById('faceValues');
                 if (faceValues) {
                     const emoji = getEmotionEmoji(dominant);
@@ -80,11 +83,13 @@ async function startFaceAPI() {
     }, 200);
 }
 
+//функция для сопозтавления эмоджи текущей эмоции
 function getEmotionEmoji(emotion) {
     const map = { neutral:'😐', happy:'😊', sad:'😢', angry:'😠', fearful:'😨', disgusted:'🤢', surprised:'😲' };
     return map[emotion] || '😐';
 }
 
+//классификация эмоций на три категории
 function classifyEmotion(emotion) {
     const positive = ['happy', 'surprised'];
     const negative = ['sad', 'angry', 'fearful', 'disgusted'];
@@ -94,7 +99,7 @@ function classifyEmotion(emotion) {
     return 'neutral';
 }
 
-// калибровка
+// отрисовка 9 точек для калибровки
 function createCalibrationPoints() {
     const points = [
         {t: '10%', l: '10%'}, {t: '10%', l: '50%'}, {t: '10%', l: '90%'},
@@ -133,7 +138,7 @@ function checkCalibrationStatus() {
     }
 }
 
-// последняя точка
+// последняя точка, на которую надо посмотреть 2 секунды
 function startFinalValidation() {
     document.querySelectorAll('.CalibrationPoint').forEach(p => p.remove());
 
@@ -174,6 +179,7 @@ function finishCalibration() {
     window.initGame();
 }
 
+//обновление позиции индикатора взгляда
 function updateGazeIndicator(x, y) {
     const gi = document.getElementById('gazeIndicator');
     if (gi) {

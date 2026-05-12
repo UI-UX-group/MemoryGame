@@ -1,7 +1,5 @@
-// game_script.js
-
-let currentRound = 1; // текуший раунд
-let isRoundFinished = false;
+let currentRound = 1; // текущий раунд
+let isRoundFinished = false; // окончание раунда
 let revealTimeout = null; // таймер для скрытия карточек
 let roundExposureTimes = {
     1: 1300,  // 1 раунд - 1300 мс
@@ -9,21 +7,26 @@ let roundExposureTimes = {
     3: 1300   // 3 раунд - 1300 мс
 };
 
+// сохранение статистики по каждому раунду
 let roundResults = {
     1:{ attempts: 0, timeToFind: [], roundTime: 0 },
     2:{ attempts: 0, timeToFind: [], roundTime: 0 },
     3:{ attempts: 0, timeToFind: [], roundTime: 0 }
 }
 
-let userID;
+let userID; //ID пользователя
 
-const cardImages = Array.from({length: 12}, (_, i) => `images/${i+1}.png`);
-let cards = [], flippedCards = [], matchedPairs = 0, attempts = 0;
-let waitForMatch = false, gameActive = false;
+const cardImages = Array.from({length: 12}, (_, i) => `images/${i+1}.png`); //пути к картинкам
+let cards = []; //все 24 карты, по 2 каждой
+flippedCards = []; // открытые карточки в текущем ходу
+matchedPairs = 0; //количество найденных пар
+attempts = 0; //попытки
+let waitForMatch = false; //ожидание анимации
+gameActive = false; //активна ли игра
 let gazeStats = {}; // храним количество взглядов на карту
-let cardAttempts = {};
+let cardAttempts = {}; //статистика открытия карты как первой
 
-let currentEmotion = 'neutral';
+let currentEmotion = 'neutral'; //текущая эмоция
 let currentEmotionConfidence = 0;
 
 let emotionEvents = {
@@ -39,7 +42,7 @@ let emotionEvents = {
     }
 };
 
-let gameStartTime = null;
+let gameStartTime = null; //время начала раунда
 let timeToFind = []; // время между нахождением пар в миллисекундах
 
 let cntErrors = 0; // количество ошибок подряд
@@ -63,7 +66,7 @@ function initGame() {
         mismatch: { positive: 0, neutral: 0, negative: 0 }
     };
 
-    gameStartTime = Date.now();
+    gameStartTime = Date.now(); //засекаем новое время начала раунда
     timeToFind = [];
     cntErrors = 0;
     currentErrors = [];
@@ -128,25 +131,30 @@ function handleCardClick(card, img) {
     card.classList.add('flipped');
     flippedCards.push({card, img, cardId});
 
+    // проверка совпадения карт
     if (flippedCards.length === 2) {
         waitForMatch = true;
         attempts++;
         document.getElementById('attempts').innerText = attempts;
 
+        //карты равны
         if (flippedCards[0].img === flippedCards[1].img) {
+            //серия ошибок более 3 закончилась
             if (cntErrors >= 3) {
                 allErrors.push([...currentErrors]);
             }
             cntErrors = 0;
             currentErrors = [];
 
+            //сохранение эмоции при совпадении
             setTimeout(() => {recordEmotionForEvent('match');}, 2000);
             matchedPairs++;
             document.getElementById('pairsFound').innerText = matchedPairs;
             flippedCards.forEach(c => c.card.classList.add('matched'));
             flippedCards = [];
             waitForMatch = false;
-            
+
+            //найдены все пары, раунд закончился
             if (matchedPairs === 12) {
                 saveCurrentRoundResults();
                 if (currentRound < 3) {
@@ -163,6 +171,7 @@ function handleCardClick(card, img) {
                 }
             }
 
+            //время нахождения правильной пары
             if (timeToFind.length === 0) {
                 timeToFind.push(Date.now() - gameStartTime);
             } else {
@@ -170,13 +179,18 @@ function handleCardClick(card, img) {
                 const currentTime = Date.now() - gameStartTime;
                 timeToFind.push(currentTime - lastPairTime);
             }
-        } else {
+        }
+        //пара не совпала
+        else {
+            // счетчик ошибок
             cntErrors++;
-
+            //сомнение
             const hoverDuration = Date.now() - hoverStartTime;
             if (hoverDuration >= 1500 && hoverDuration < 1600) {
                 hesitationEvents.push(hoverDuration);
             }
+
+            //эмоция при ошибке
             setTimeout(() => {recordEmotionForEvent('mismatch');}, 2000);
 
             currentHoverCard = null;
@@ -244,6 +258,7 @@ function showRoundStartMessage() {
     }, 1500);
 }
 
+//сохранение результатов о раунде
 function saveCurrentRoundResults() {
     const roundTime = Date.now() - gameStartTime;
     const timeFormatted = `${Math.floor(roundTime / 60000)}:${Math.floor((roundTime % 60000) / 1000).toString().padStart(2, '0')}`;
@@ -264,6 +279,7 @@ function saveCurrentRoundResults() {
     console.log(`Раунд ${currentRound} завершён! Попыток: ${attempts}, Время: ${timeFormatted}`);
 }
 
+//начало следующего раунда
 function startNextRound() {
     // Очищаем игровую доску
     const board = document.getElementById('board');
@@ -277,6 +293,7 @@ function startNextRound() {
     initGame();
 }
 
+//закончились все раунды, показ окна с финальным опросом
 function finishAllRounds() {
     gameActive = false;
     if (typeof webgazer !== 'undefined') {
