@@ -1,7 +1,6 @@
-// results.js
-
 // сохранение скриншота и json файла с результатами эмоций в зип архив
 function downloadResults() {
+    //результаты опроса
     const surveyData = {
         userID: window.userID,
         timestamp: new Date().toISOString(),
@@ -37,6 +36,8 @@ function downloadResults() {
     createHeatmapAndDownload(zip);
 }
 
+
+//создание тепловой карты
 function createHeatmapAndDownload(zip) {
     const hiddenContainer = document.createElement('div');
     hiddenContainer.style.position = 'absolute';
@@ -67,6 +68,7 @@ function createHeatmapAndDownload(zip) {
     const board = document.getElementById('board');
     const boardRect = board.getBoundingClientRect();
 
+    // Проходим по всем картам на поле
     cardsElements.forEach((card, index) => {
         const count = window.gazeStats[index] || 0;
         if (count > 0) {
@@ -86,6 +88,7 @@ function createHeatmapAndDownload(zip) {
     });
 
     setTimeout(() => {
+        // Конвертируем контейнер с тепловой картой в PNG с помощью html2canvas
         html2canvas(hiddenContainer, {
             scale: 1,
             useCORS: true,
@@ -104,6 +107,8 @@ function createHeatmapAndDownload(zip) {
     }, 500);
 }
 
+
+//собираем все файлы в zip архив
 function generateZip(zip) {
     zip.generateAsync({ type: "blob" }).then(function(content) {
         const link = document.createElement('a');
