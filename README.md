@@ -65,5 +65,6 @@ python -m http.server 8000
 └── style_game.css        # Стили
 ```
 
-## Автор 
+## Авторы
+Владимир Андреевич Пархоменко - ParkhomenkoV\
 Полина Долгая – dolgayapolina
