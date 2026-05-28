@@ -1,0 +1,301 @@
+{
+  "userID": "92",
+  "timestamp": "2026-05-28T16:46:28.685106Z",
+  "rounds": {
+    "1": {
+      "attempts": 26,
+      "matchedPairs": 12,
+      "timeToFind": [
+        4409,
+        12930,
+        6600,
+        11477,
+        6628,
+        2795,
+        3863,
+        12081,
+        11230,
+        6821,
+        6404
+      ],
+      "roundTime": 85238,
+      "roundTimeFormatted": "1:25",
+      "emotionEvents": {
+        "match": {
+          "positive": 0,
+          "neutral": 12,
+          "negative": 0
+        },
+        "mismatch": {
+          "positive": 0,
+          "neutral": 12,
+          "negative": 2
+        }
+      },
+      "allErrors": [
+        [
+          "neutral",
+          "neutral"
+        ],
+        [
+          "neutral",
+          "neutral",
+          "neutral",
+          "neutral",
+          "neutral",
+          "sad",
+          "neutral"
+        ],
+        [
+          "sad",
+          "neutral",
+          "neutral"
+        ],
+        [
+          "neutral",
+          "neutral"
+        ]
+      ],
+      "hesitationEvents": [],
+      "gazeStats": {
+        "0": 82,
+        "1": 160,
+        "2": 160,
+        "3": 116,
+        "4": 148,
+        "5": 137,
+        "6": 48,
+        "7": 291,
+        "8": 416,
+        "9": 335,
+        "10": 264,
+        "11": 295,
+        "12": 300,
+        "13": 297,
+        "14": 408,
+        "15": 397,
+        "16": 87,
+        "17": 147,
+        "18": 153,
+        "19": 59,
+        "20": 119,
+        "21": 154,
+        "22": 139,
+        "23": 104
+      },
+      "cardAttempts": {
+        "1": 2,
+        "2": 1,
+        "3": 2,
+        "4": 2,
+        "5": 2,
+        "6": 4,
+        "7": 3,
+        "8": 2,
+        "9": 2,
+        "10": 2,
+        "11": 1,
+        "12": 3
+      }
+    },
+    "2": {
+      "attempts": 24,
+      "matchedPairs": 12,
+      "timeToFind": [
+        6012,
+        8964,
+        4746,
+        2361,
+        5539,
+        5253,
+        7960,
+        4208,
+        9871,
+        8141,
+        6451
+      ],
+      "roundTime": 69506,
+      "roundTimeFormatted": "1:09",
+      "emotionEvents": {
+        "match": {
+          "positive": 4,
+          "neutral": 8,
+          "negative": 0
+        },
+        "mismatch": {
+          "positive": 0,
+          "neutral": 11,
+          "negative": 1
+        }
+      },
+      "allErrors": [
+        [
+          "neutral",
+          "neutral"
+        ],
+        [
+          "neutral",
+          "neutral",
+          "neutral",
+          "neutral"
+        ],
+        [
+          "neutral",
+          "neutral",
+          "neutral",
+          "neutral",
+          "sad"
+        ],
+        [
+          "neutral"
+        ]
+      ],
+      "hesitationEvents": [],
+      "gazeStats": {
+        "0": 177,
+        "1": 127,
+        "2": 47,
+        "3": 165,
+        "4": 177,
+        "5": 91,
+        "6": 100,
+        "7": 317,
+        "8": 313,
+        "9": 257,
+        "10": 299,
+        "11": 267,
+        "12": 359,
+        "13": 279,
+        "14": 356,
+        "15": 315,
+        "16": 79,
+        "17": 186,
+        "18": 125,
+        "19": 134,
+        "20": 135,
+        "21": 133,
+        "22": 174,
+        "23": 140
+      },
+      "cardAttempts": {
+        "1": 3,
+        "2": 1,
+        "3": 4,
+        "4": 2,
+        "5": 1,
+        "6": 1,
+        "7": 1,
+        "8": 3,
+        "9": 2,
+        "10": 1,
+        "11": 2,
+        "12": 3
+      }
+    },
+    "3": {
+      "attempts": 33,
+      "matchedPairs": 12,
+      "timeToFind": [
+        13209,
+        8619,
+        13823,
+        4355,
+        15526,
+        7610,
+        5776,
+        5262,
+        14653,
+        10545,
+        2682
+      ],
+      "roundTime": 102060,
+      "roundTimeFormatted": "1:42",
+      "emotionEvents": {
+        "match": {
+          "positive": 0,
+          "neutral": 12,
+          "negative": 0
+        },
+        "mismatch": {
+          "positive": 0,
+          "neutral": 16,
+          "negative": 5
+        }
+      },
+      "allErrors": [
+        [
+          "happy",
+          "neutral",
+          "neutral",
+          "sad",
+          "neutral",
+          "sad",
+          "neutral",
+          "sad"
+        ],
+        [
+          "happy",
+          "sad",
+          "sad"
+        ],
+        [
+          "happy",
+          "sad"
+        ],
+        [
+          "happy",
+          "neutral",
+          "neutral",
+          "neutral",
+          "sad"
+        ],
+        [
+          "happy",
+          "neutral",
+          "sad"
+        ]
+      ],
+      "hesitationEvents": [],
+      "gazeStats": {
+        "0": 251,
+        "1": 102,
+        "2": 118,
+        "3": 294,
+        "4": 107,
+        "5": 272,
+        "6": 101,
+        "7": 630,
+        "8": 505,
+        "9": 585,
+        "10": 431,
+        "11": 631,
+        "12": 540,
+        "13": 441,
+        "14": 587,
+        "15": 595,
+        "16": 255,
+        "17": 75,
+        "18": 89,
+        "19": 235,
+        "20": 190,
+        "21": 162,
+        "22": 279,
+        "23": 300
+      },
+      "cardAttempts": {
+        "1": 2,
+        "2": 3,
+        "3": 2,
+        "4": 3,
+        "5": 2,
+        "6": 4,
+        "7": 2,
+        "8": 3,
+        "9": 3,
+        "10": 3,
+        "11": 4,
+        "12": 2
+      }
+    }
+  }
+}
