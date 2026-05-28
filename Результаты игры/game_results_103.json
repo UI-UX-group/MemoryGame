@@ -3,32 +3,32 @@
   "timestamp": "2026-05-04T08:27:47.237Z",
   "rounds": {
     "1": {
-      "attempts": 27,
+      "attempts": 24,
       "matchedPairs": 12,
       "timeToFind": [
-        19489,
-        3006,
-        32200,
-        11370,
-        39143,
-        17953,
-        43574,
-        25758,
-        50263,
-        28424,
-        56235
+        4381,
+        676,
+        7238,
+        2556,
+        8799,
+        4035,
+        9794,
+        5790,
+        11300,
+        6390,
+        12628
       ],
-      "roundTime": 86681,
+      "roundTime": 73587,
       "roundTimeFormatted": "1:26",
       "emotionEvents": {
         "match": {
           "positive": 0,
-          "neutral": 10,
+          "neutral": 12,
           "negative": 0
         },
         "mismatch": {
           "positive": 0,
-          "neutral": 15,
+          "neutral": 12,
           "negative": 0
         }
       },
@@ -89,33 +89,33 @@
       }
     },
     "2": {
-      "attempts": 28,
+      "attempts": 32,
       "matchedPairs": 12,
       "timeToFind": [
-        18746,
-        3022,
-        29317,
-        7953,
-        34784,
-        13174,
-        42691,
-        17483,
-        48688,
-        22392,
-        50848
+       3545,
+        547,
+        5856,
+        2068,
+        7118,
+        3264,
+        7924,
+        4684,
+        9141,
+        5169,
+        10204
       ],
-      "roundTime": 75768,
+      "roundTime": 59520,
       "roundTimeFormatted": "1:15",
       "emotionEvents": {
         "match": {
-          "positive": 0,
-          "neutral": 9,
-          "negative": 2
+          "positive": 5,
+          "neutral": 7,
+          "negative": 0
         },
         "mismatch": {
           "positive": 0,
-          "neutral": 15,
-          "negative": 1
+          "neutral": 20,
+          "negative": 0
         }
       },
       "allErrors": [
@@ -176,33 +176,33 @@
       }
     },
     "3": {
-      "attempts": 31,
+      "attempts": 19,
       "matchedPairs": 12,
       "timeToFind": [
-        12874,
-        10654,
-        18505,
-        16090,
-        32527,
-        26452,
-        46851,
-        30384,
-        59618,
-        36185,
-        64419
+        1933,
+        1600,
+        2778,
+        2416,
+        4883,
+        3971,
+        7033,
+        4562,
+        8950,
+        5432,
+        9660
       ],
-      "roundTime": 102562,
+      "roundTime": 53218,
       "roundTimeFormatted": "1:42",
       "emotionEvents": {
         "match": {
           "positive": 0,
-          "neutral": 9,
-          "negative": 1
+          "neutral": 12,
+          "negative": 0
         },
         "mismatch": {
           "positive": 0,
-          "neutral": 17,
-          "negative": 2
+          "neutral": 7,
+          "negative": 0
         }
       },
       "allErrors": [

@@ -1,6 +1,6 @@
 {
   "userID": "68",
-  "timestamp": "2026-04-27T07:51:41.300Z",
+  "timestamp": "2026-05-28T14:12:39.420775",
   "easierEachRound": "1",
   "strategyMoment": "never",
   "changedApproach": "no",
@@ -8,6 +8,6 @@
   "multiTask": "5",
   "slowReaction": "no",
   "excitement": "3",
-  "frustration": "no",
+  "frustration": "yes",
   "wantContinue": "yes"
 }

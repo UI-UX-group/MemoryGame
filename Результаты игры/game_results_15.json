@@ -3,33 +3,33 @@
   "timestamp": "2026-04-27T06:33:08.160Z",
   "rounds": {
     "1": {
-      "attempts": 27,
+      "attempts": 46,
       "matchedPairs": 12,
       "timeToFind": [
-        20714,
-        13249,
-        29158,
-        17120,
-        31881,
-        22465,
-        37187,
-        24707,
-        39750,
-        30656,
-        42253
+        8462,
+        5413,
+        11914,
+        6995,
+        13026,
+        9180,
+        15196,
+        10096,
+        12526,
+        16243,
+        17266
       ],
-      "roundTime": 74814,
+      "roundTime": 142651,
       "roundTimeFormatted": "1:14",
       "emotionEvents": {
         "match": {
-          "positive": 0,
-          "neutral": 10,
+          "positive": 9,
+          "neutral": 3,
           "negative": 0
         },
         "mismatch": {
           "positive": 0,
-          "neutral": 15,
-          "negative": 0
+          "neutral": 0,
+          "negative": 34
         }
       },
       "allErrors": [

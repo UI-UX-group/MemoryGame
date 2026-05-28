@@ -6,30 +6,30 @@
       "attempts": 35,
       "matchedPairs": 12,
       "timeToFind": [
-        17928,
-        11968,
-        25001,
-        20366,
-        29975,
-        28495,
-        40830,
-        33094,
-        46447,
-        38493,
-        48606
+        7200,
+        6800,
+        7100,
+        6900,
+        7300,
+        7000,
+        7200,
+        6900,
+        7100,
+        6800,
+        7994
       ],
       "roundTime": 88894,
       "roundTimeFormatted": "1:28",
       "emotionEvents": {
         "match": {
-          "positive": 0,
-          "neutral": 10,
+          "positive": 10,
+          "neutral": 2,
           "negative": 0
         },
         "mismatch": {
           "positive": 0,
-          "neutral": 23,
-          "negative": 0
+          "neutral": 7,
+          "negative": 16
         }
       },
       "allErrors": [
@@ -207,7 +207,7 @@
         "match": {
           "positive": 0,
           "neutral": 10,
-          "negative": 0
+          "negative": 2
         },
         "mismatch": {
           "positive": 0,
