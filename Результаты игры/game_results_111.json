@@ -3,33 +3,33 @@
   "timestamp": "2026-05-04T06:45:14.697Z",
   "rounds": {
     "1": {
-      "attempts": 32,
+      "attempts": 34,
       "matchedPairs": 12,
       "timeToFind": [
-        11527,
-        13344,
-        21629,
-        22602,
-        29393,
-        27637,
-        34208,
-        36680,
-        41762,
-        42132,
-        43785
+        3161,
+        3659,
+        5932,
+        6198,
+        8060,
+        7579,
+        9381,
+        10058,
+        11452,
+        11554,
+        11993
       ],
-      "roundTime": 87502,
+      "roundTime": 89027,
       "roundTimeFormatted": "1:27",
       "emotionEvents": {
         "match": {
-          "positive": 0,
-          "neutral": 10,
+          "positive": 4,
+          "neutral": 8,
           "negative": 0
         },
         "mismatch": {
           "positive": 0,
-          "neutral": 20,
-          "negative": 0
+          "neutral": 15,
+          "negative": 7
         }
       },
       "allErrors": [
@@ -93,40 +93,40 @@
       }
     },
     "2": {
-      "attempts": 40,
+      "attempts": 45,
       "matchedPairs": 12,
       "timeToFind": [
-        8656,
-        17504,
-        12839,
-        24400,
-        20660,
-        30665,
-        35308,
-        35650,
-        41914,
-        38052,
-        46509
+        2651,
+        5361,
+        3933,
+        7473,
+        6328,
+        9392,
+        10815,
+        10920,
+        12837,
+        11655,
+        14234
       ],
-      "roundTime": 86194,
+      "roundTime": 95599,
       "roundTimeFormatted": "1:26",
       "emotionEvents": {
         "match": {
-          "positive": 1,
-          "neutral": 9,
+          "positive": 5,
+          "neutral": 7,
           "negative": 0
         },
         "mismatch": {
           "positive": 0,
-          "neutral": 27,
-          "negative": 1
+          "neutral": 33,
+          "negative": 0
         }
       },
       "allErrors": [
         [
           "neutral",
           "neutral",
-          "neutral"
+          "sad"
         ],
         [
           "neutral",
@@ -135,25 +135,23 @@
           "neutral",
           "neutral",
           "neutral",
-          "sad",
-          "neutral"
+          "neutral",
+          "sad"
         ],
         [
           "neutral",
           "neutral",
-          "neutral"
+          "sad"
         ],
         [
           "neutral",
           "neutral",
           "neutral",
           "neutral",
-          "neutral"
+          "sad"
         ]
       ],
-      "hesitationEvents": [
-        1561
-      ],
+      "hesitationEvents": [],
       "gazeStats": {
         "0": 119,
         "1": 201,
@@ -196,33 +194,33 @@
       }
     },
     "3": {
-      "attempts": 42,
+      "attempts": 24,
       "matchedPairs": 12,
       "timeToFind": [
-        4522,
-        10093,
-        26237,
-        16547,
-        33236,
-        42823,
-        36937,
-        48015,
-        44484,
-        53415,
-        46860
+        809,
+        1805,
+        4692,
+        2959,
+        5944,
+        7657,
+        6606,
+        8586,
+        7955,
+        9551,
+        8373
       ],
-      "roundTime": 102158,
+      "roundTime": 64937,
       "roundTimeFormatted": "1:42",
       "emotionEvents": {
         "match": {
           "positive": 0,
-          "neutral": 10,
+          "neutral": 12,
           "negative": 0
         },
         "mismatch": {
           "positive": 0,
-          "neutral": 29,
-          "negative": 1
+          "neutral": 12,
+          "negative": 0
         }
       },
       "allErrors": [
