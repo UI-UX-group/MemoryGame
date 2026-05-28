@@ -57,6 +57,8 @@ python -m http.server 8000
 ├── mediapipe/            # MediaPipe для WebGazer
 ├── models/               # Модели для FaceAPI
 ├── webgazer/             # Библиотека WebGazer
+├── Результаты опроса/
+├── Результаты раундов/
 ├── game.html             # Главная страница
 ├── calibration.js        # Калибровка взгляда
 ├── game_script.js        # Логика игры
